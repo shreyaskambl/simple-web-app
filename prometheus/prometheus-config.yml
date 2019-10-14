@@ -1,0 +1,46 @@
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: v1
+data:
+  prometheus.yml: |
+    # my global config
+    global:
+      scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+      evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+      # scrape_timeout is set to the global default (10s).
+
+    # Alertmanager configuration
+    alerting:
+      alertmanagers:
+      - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+    # Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+    rule_files:
+      # - "first_rules.yml"
+      # - "second_rules.yml"
+
+    # A scrape configuration containing exactly one endpoint to scrape:
+    # Here it's Prometheus itself.
+    scrape_configs:
+      - job_name: 'kubernetes-pods'
+        kubernetes_sd_configs:
+        - role: pod
+          namespaces:
+            names: [default]
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_pod_name]
+          regex: '(^.*).*'
+          target_label: 'kubernetes_pod_name'
+          replacement: '$1'
+        - source_labels: [__meta_kubernetes_namespace]
+          regex: '(^.*).*'
+          target_label: 'kubernetes_namespace'
+          replacement: '$1'
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: default
