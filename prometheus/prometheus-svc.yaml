@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: prometheus
+  name: prometheus
+  namespace: default
+spec:
+  - port: 9090
+    protocol: TCP
+    targetPort: 9090
+  selector:
+    run: prometheus
+  sessionAffinity: None
+  type: ClusterIP
